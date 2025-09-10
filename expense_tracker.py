@@ -91,9 +91,9 @@ if not df.empty:
     expense_total = df[df["Type"] == "expense"]["Amount"].sum()
     balance = income_total - expense_total
 
-    st.metric("Total Income", f"${income_total:,.2f}")
-    st.metric("Total Expenses", f"${expense_total:,.2f}")
-    st.metric("Balance", f"${balance:,.2f}")
+    st.metric("Total Income", f"{income_total:,.2f}€")
+    st.metric("Total Expenses", f"{expense_total:,.2f}€")
+    st.metric("Balance", f"{balance:,.2f}€")
 
     # Fix for Streamlit 1.49+: flatten MultiIndex for bar_chart
     summary_df = df.groupby(["Type", "Category"])["Amount"].sum().reset_index()
@@ -106,3 +106,4 @@ if not df.empty:
     if st.button("Delete"):
         delete_transaction(txn_id)
         st.warning(f"Deleted transaction with ID {txn_id}")
+
