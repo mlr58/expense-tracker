@@ -3,7 +3,9 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from datetime import datetime
 
-# --- Password Protection ---
+# -----------------------
+# Password Protection
+# -----------------------
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
@@ -16,13 +18,14 @@ if not st.session_state.authenticated:
             st.success("Login successful!")
         else:
             st.error("Incorrect password")
-    st.stop()  # stops the rest of the app from running until login
+    st.stop()  # stops the rest of the app until login
 
-# --- Database connection (Neon) ---
+# -----------------------
+# Database connection
+# -----------------------
 DATABASE_URL = st.secrets["DATABASE_URL"]
 engine = create_engine(DATABASE_URL)
 
-# Create table if not exists
 with engine.begin() as conn:
     conn.execute(text('''
         CREATE TABLE IF NOT EXISTS transactions (
@@ -35,7 +38,9 @@ with engine.begin() as conn:
         )
     '''))
 
-# --- Functions ---
+# -----------------------
+# Functions
+# -----------------------
 def add_transaction(date, ttype, category, amount, description):
     with engine.begin() as conn:
         conn.execute(
@@ -53,7 +58,9 @@ def delete_transaction(txn_id):
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM transactions WHERE id=:id"), {"id": txn_id})
 
-# --- Streamlit UI ---
+# -----------------------
+# Streamlit UI
+# -----------------------
 st.set_page_config(page_title="💰 Income & Expense Tracker", layout="wide")
 st.title("💰 Income & Expense Tracker")
 
@@ -74,7 +81,7 @@ with st.form("transaction_form"):
 # Show transactions
 st.header("All Transactions")
 df = get_transactions()
-st.dataframe(df, use_container_width=True)
+st.dataframe(df)
 
 # Summary and Balance
 if not df.empty:
@@ -88,10 +95,9 @@ if not df.empty:
     st.metric("Total Expenses", f"${expense_total:,.2f}")
     st.metric("Balance", f"${balance:,.2f}")
 
-    # Fix for bar_chart MultiIndex issue
+    # Fix for Streamlit 1.49+: flatten MultiIndex for bar_chart
     summary_df = df.groupby(["Type", "Category"])["Amount"].sum().reset_index()
-    st.bar_chart(summary_df, x="Category", y="Amount", width="stretch")
-
+    st.bar_chart(summary_df, x="Category", y="Amount", use_container_width=True)
 
 # Delete transactions
 st.header("Delete Transaction")
@@ -100,4 +106,3 @@ if not df.empty:
     if st.button("Delete"):
         delete_transaction(txn_id)
         st.warning(f"Deleted transaction with ID {txn_id}")
-
