@@ -3,6 +3,21 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from datetime import datetime
 
+# --- Password Protection ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.title("🔒 Income & Expense Tracker Login")
+    password = st.text_input("Enter password", type="password")
+    if st.button("Login"):
+        if password == st.secrets["APP_PASSWORD"]:
+            st.session_state.authenticated = True
+            st.success("Login successful!")
+        else:
+            st.error("Incorrect password")
+    st.stop()  # stops the rest of the app from running until login
+
 # --- Database connection (Neon) ---
 DATABASE_URL = st.secrets["DATABASE_URL"]
 engine = create_engine(DATABASE_URL)
@@ -38,7 +53,6 @@ def delete_transaction(txn_id):
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM transactions WHERE id=:id"), {"id": txn_id})
 
-
 # --- Streamlit UI ---
 st.set_page_config(page_title="💰 Income & Expense Tracker", layout="wide")
 st.title("💰 Income & Expense Tracker")
@@ -65,7 +79,6 @@ st.dataframe(df, use_container_width=True)
 # Summary and Balance
 if not df.empty:
     st.subheader("Summary")
-
     income_total = df[df["Type"] == "income"]["Amount"].sum()
     expense_total = df[df["Type"] == "expense"]["Amount"].sum()
     balance = income_total - expense_total
