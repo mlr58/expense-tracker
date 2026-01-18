@@ -6,19 +6,19 @@ from datetime import datetime
 # -----------------------
 # Password Protection
 # -----------------------
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
+# if "authenticated" not in st.session_state:
+#     st.session_state.authenticated = False
 
-if not st.session_state.authenticated:
-    st.title("🔒 Income & Expense Tracker Login")
-    password = st.text_input("Enter password", type="password")
-    if st.button("Login"):
-        if password == st.secrets["APP_PASSWORD"]:
-            st.session_state.authenticated = True
-            st.success("Login successful!")
-        else:
-            st.error("Incorrect password")
-    st.stop()  # stops the rest of the app until login
+# if not st.session_state.authenticated:
+#     st.title("🔒 Income & Expense Tracker Login")
+#     password = st.text_input("Enter password", type="password")
+#     if st.button("Login"):
+#         if password == st.secrets["APP_PASSWORD"]:
+#             st.session_state.authenticated = True
+#             st.success("Login successful!")
+#         else:
+#             st.error("Incorrect password")
+#     st.stop()  # stops the rest of the app until login
 
 # -----------------------
 # Database connection
@@ -106,4 +106,5 @@ if not df.empty:
     if st.button("Delete"):
         delete_transaction(txn_id)
         st.warning(f"Deleted transaction with ID {txn_id}")
+
 
